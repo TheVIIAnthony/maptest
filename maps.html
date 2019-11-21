@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<head>
+<style>#map-canvas{
+ width: 600px;
+ height: 500px;
+}
+</style>
+</head>
+<body>
+<button id="location-button">Obtener ubicacion</button>
+<input type="text" id="mapsearch">
+<button> Seleccionar origen</button>
+<button id="ubicacion-actual">Usar ubicacion actual</button>
+<br>
+<input type="text" id="mapsearch2">
+<button>Seleccionar destino</button>
+<div id="map-canvas">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC5rTAKFqIj-htRhtz6VXm0KmEjifIzqm4&libraries=places"></script>
+</div>
+<script>
+          $('#location-button').click(function(){
+        
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position){
+                  console.log(position);
+                  $.get( "https://maps.googleapis.com/maps/api/geocode/json?latlng="+ position.coords.latitude + "," + position.coords.longitude +"&sensor=false&key=AIzaSyC5rTAKFqIj-htRhtz6VXm0KmEjifIzqm4", function(data) {
+                    console.log(data);
+                  })
+                  var img = new Image();
+                  img.src = "https://maps.googleapis.com/maps/api/staticmap?center=" + position.coords.latitude + "," + position.coords.longitude + "&zoom=13&size=800x400&sensor=false&key=AIzaSyC5rTAKFqIj-htRhtz6VXm0KmEjifIzqm4";
+                  $('#output').html(img);
+                });
+                
+            }
+          });
+</script>          
+<script type="text/javascript">
+
+  //se crea un mapa y un marcador
+
+ var map = new google.maps.Map(document.getElementById('map-canvas'),{
+  center:{
+   lat: 19.4978,
+   lng: -99.1269
+  },
+  zoom:15
+ });
+
+ var marker = new google.maps.Marker({
+   map:map,
+   draggable: false
+ });
+
+//ese codigo se ejecuta para conseguir la ubicacion del usuario
+   if (navigator.geolocation) {
+     navigator.geolocation.getCurrentPosition(function (position) {
+         initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+         map.setCenter(initialLocation);
+         marker.setPosition(initialLocation);         
+     });
+ }
+
+//aqui se crea un searchbox para busqueda de autocompletado
+var searchBox = new google.maps.places.SearchBox(document.getElementById('mapsearch'));
+
+google.maps.event.addListener(searchBox, 'places_changed',function(){
+
+ var places = searchBox.getPlaces();
+
+ var bounds = new google.maps.LatLngBounds();
+ var i, place;
+
+ for(i=0; place=places[i];i++){
+  bounds.extend(place.geometry.location);
+  marker.setPosition(place.geometry.location);
+ }
+ map.fitBounds(bounds);
+ map.setZoom(15);
+})
+
+
+
+</script>
+<script type="text/javascript">
+
+var map = new google.maps.Map(document.getElementById('map-canvas'),{
+  center:{
+   lat: 19.4978,
+   lng: -99.1269
+  },
+  zoom:15
+ });
+
+ var marker2 = new google.maps.Marker({
+   map:map,
+   draggable: false
+ });
+
+
+   if (navigator.geolocation) {
+     navigator.geolocation.getCurrentPosition(function (position) {
+         initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+         map.setCenter(initialLocation);
+         marker2.setPosition(initialLocation);         
+     });
+ }
+
+var searchBox = new google.maps.places.SearchBox(document.getElementById('mapsearch2'));
+
+google.maps.event.addListener(searchBox, 'places_changed',function(){
+
+ var places = searchBox.getPlaces();
+
+ var bounds = new google.maps.LatLngBounds();
+ var i, place;
+
+ for(i=0; place=places[i];i++){
+  bounds.extend(place.geometry.location);
+  marker2.setPosition(place.geometry.location);
+ }
+ map.fitBounds(bounds);
+ map.setZoom(15);
+})
+</script>
+</body>
+</html>
